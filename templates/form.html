@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Invoice Generator</title>
+<style>
+:root {
+    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --accent-color: #7c3aed;
+    --accent-light: #8b5cf6;
+    --dark-bg: #0f172a;
+    --card-bg: rgba(255, 255, 255, 0.95);
+    --card-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --border-color: rgba(226, 232, 240, 0.8);
+    --success-color: #10b981;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent; /* Clean mobile taps */
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: #f1f1f1; }
+::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
+
+body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 100%);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
+    min-height: 100vh;
+    padding: clamp(1rem, 5vw, 3rem); /* Adaptive padding */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--text-primary);
+    line-height: 1.5;
+}
+
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.container {
+    background: var(--card-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: clamp(1.5rem, 4vw, 2rem);
+    box-shadow: var(--card-shadow);
+    padding: clamp(1.5rem, 5vw, 3rem);
+    max-width: 1100px;
+    width: 100%;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s ease;
+}
+
+/* Header Adjustments */
+.header {
+    display: flex;
+    flex-wrap: wrap; /* Wraps on small screens */
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 2px solid var(--border-color);
+}
+
+h1 {
+    font-size: clamp(1.5rem, 6vw, 2.5rem);
+    font-weight: 800;
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -1px;
+}
+
+/* Responsive Grid */
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.section {
+    background: rgba(248, 250, 252, 0.6);
+    border-radius: 1.25rem;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--border-color);
+    position: relative;
+}
+
+/* Better Inputs for Mobile */
+input {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 16px; /* Prevents iOS auto-zoom on focus */
+    border-radius: 12px;
+    border: 2px solid var(--border-color);
+    transition: all 0.2s ease;
+}
+
+input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.15);
+}
+
+/* Mobile-First Total Row */
+.total-row {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 2rem;
+    border-radius: 1.5rem;
+    background: var(--primary-gradient);
+    color: white;
+    margin-top: 2rem;
+    gap: 1rem;
+}
+
+.total-input {
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    font-size: clamp(1.2rem, 5vw, 2rem);
+    font-weight: 800;
+    text-align: right;
+    padding: 0.75rem 1.25rem;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 300px;
+}
+
+button[type="submit"] {
+    /* Layout & Sizing */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%; /* Full width for mobile friendliness */
+    min-height: 60px; /* Large touch target */
+    margin-top: 2rem;
+    padding: 16px 32px;
+    
+    /* Styling */
+    background: var(--primary-gradient);
+    color: #ffffff;
+    font-size: 1.2rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border: none;
+    border-radius: 18px;
+    
+    /* Effects */
+    cursor: pointer;
+    box-shadow: 0 10px 25px rgba(118, 75, 162, 0.3);
+    transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Hover & Desktop interaction */
+@media (padding-bottom: 1024px) {
+    button[type="submit"]:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 30px rgba(118, 75, 162, 0.4);
+        filter: brightness(1.1);
+    }
+}
+
+/* Active/Tap state for mobile feedback */
+button[type="submit"]:active {
+    transform: scale(0.97);
+    box-shadow: 0 5px 15px rgba(118, 75, 162, 0.2);
+}
+
+/* Optional: Add a subtle loading or icon space */
+button[type="submit"]::after {
+    content: '→';
+    margin-left: 12px;
+    font-size: 1.4rem;
+    transition: transform 0.3s ease;
+}
+
+button[type="submit"]:hover::after {
+    transform: translateX(5px);
+}
+
+/* Desktop-specific hover (disables on mobile to avoid 'sticky' hover states) */
+@media (padding-bottom: 1024px) {
+    .container:hover { transform: translateY(-5px); }
+    .submit-btn:hover { opacity: 0.9; transform: translateY(-2px); }
+}
+
+/* Small Screen Adjustments */
+@media (max-width: 600px) {
+    .header { justify-content: center; text-align: center; }
+    .total-row { flex-direction: column; text-align: center; }
+    .total-input { text-align: center; max-width: 100%; }
+    .section { padding: 1.25rem; }
+}
+</style>
+     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="container">
+    <h2>Vehicle Hire Invoice Generator</h2>
+    <form method="POST" action="/generate">
+
+        <!-- Date at Top -->
+        <div class="section">
+            <h3>Invoice Date</h3>
+            <div class="form-grid">
+                <div>
+                    <label>Date</label>
+                    <input type="date" id="invoice_date" name="date" >
+                </div>
+            </div>
+        </div>
+
+        <!-- Customer Info -->
+        <div class="section">
+            <h3>Customer Information</h3>
+            <div class="form-grid">
+                <div>
+                    <label>Customer Name</label>
+                    <input type="text" name="name" placeholder="John Doe">
+                </div>
+                <div>
+                    <label>Company Name</label>
+                    <input type="text" name="company_name" placeholder="JLL">
+                </div>
+                <div>
+                    <label>Type of Charge</label>
+                    <input type="text" name="charge_type" placeholder="Vehicle Hiring">
+                </div>
+                <div>
+                    <label>Billing Period From</label>
+                    <input type="date" id="billing_from" name="billing_from">
+                </div>
+                <div>
+                    <label>Billing Period To</label>
+                    <input type="date" id="billing_to" name="billing_to">
+                </div>
+                <div style="grid-column: span 4;">
+                    <label>Billing Period</label>
+                    <input type="text" id="billing_period" name="billing_period" placeholder="01st Feb 2026 to 28th Feb 2026" readonly>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vehicle Hire Charges -->
+        <div class="section">
+            <h3>Vehicle Hire Charges</h3>
+            <div class="form-grid">
+                <div><label>Description</label><input type="text" name="description1" placeholder="Vehicle Hire Charges"></div>
+                <div><label>Days</label><input type="text" name="days1" placeholder="Monthly"></div>
+                <div><label>Rate</label><input type="text" name="rate1" placeholder="0"></div>
+                <div><label>Amount</label><input type="text" name="amount1" placeholder="0" readonly></div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>Paid Working Days</h3>
+            <div class="form-grid">
+                <div><label>Days</label><input type="text" name="days" placeholder="0"></div>
+                <div><label>Rate</label><input type="text" name="rate" placeholder="0"></div>
+                <div><label>Amount</label><input type="text" name="amount" placeholder="0" readonly></div>
+            </div>
+        </div>
+        <!-- Paid Working Days -->
+        <div class="section">
+            <h3>Paid Holidays</h3>
+            <div class="form-grid">
+                <div><label>Days</label><input type="text" name="days2" placeholder="NA"></div>
+                <div><label>Rate</label><input type="text" name="rate2" placeholder="NA"></div>
+                <div><label>Amount</label><input type="text" name="amount2" placeholder="NA" readonly></div>
+                
+            </div>
+        </div>
+
+        <!-- Additions -->
+        <div class="section">
+            <h3>Additions</h3>
+            <div class="form-grid">
+                <h4>Extra Km / Hours</h4>
+                <div><label>Days</label><input type="text" name="extra_days" placeholder="NA"></div>
+                <div><label>Rate</label><input type="text" name="extra_rate" placeholder="NA"></div>
+                <div><label>Amount</label><input type="text" name="extra_amount" placeholder="NA"></div>
+
+                <h4>Toll / Parking </h4>
+                <div><label>Days</label><input type="text" name="toll_days" placeholder="NA"></div>
+                <div><label>Rate</label><input type="text" name="toll_rate" placeholder="NA"></div>
+                <div><label>Amount</label><input type="text" name="toll_amount" placeholder="NA"></div>
+            </div>
+        </div>
+
+        <!-- Total -->
+        <div class="total-row">
+            <label>Total Amount:</label>
+            <input type="text" name="total" placeholder="75000">
+        </div>
+
+        <button type="submit">Generate PDF</button>
+    </form>
+</div>
+
+<script>
+    // Ordinal function
+    function getOrdinal(day) {
+        if (day > 3 && day < 21) return day + 'th';
+        switch (day % 10) {
+            case 1: return day + 'st';
+            case 2: return day + 'nd';
+            case 3: return day + 'rd';
+            default: return day + 'th';
+        }
+    }
+
+    // Update billing period
+    const fromInput = document.getElementById('billing_from');
+    const toInput = document.getElementById('billing_to');
+    const billingPeriodDisplay = document.getElementById('billing_period');
+
+    function updateBillingPeriod() {
+        const fromDate = new Date(fromInput.value);
+        const toDate = new Date(toInput.value);
+        if (!isNaN(fromDate) && !isNaN(toDate)) {
+            const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+            const fromDay = getOrdinal(fromDate.getDate());
+            const fromMonth = monthNames[fromDate.getMonth()];
+            const fromYear = fromDate.getFullYear();
+            const toDay = getOrdinal(toDate.getDate());
+            const toMonth = monthNames[toDate.getMonth()];
+            const toYear = toDate.getFullYear();
+            billingPeriodDisplay.value = `${fromDay} ${fromMonth} ${fromYear} to ${toDay} ${toMonth} ${toYear}`;
+        }
+    }
+
+    fromInput.addEventListener('change', updateBillingPeriod);
+    toInput.addEventListener('change', updateBillingPeriod);
+
+    // Auto-calculate amounts
+    const calcInputs = document.querySelectorAll(
+        "input[name='days'], input[name='rate'], input[name='rate1'], input[name='days2'], input[name='rate2']"
+    );
+
+    document.querySelectorAll("input").forEach(input => {
+    input.addEventListener("input", calculateTotal);
+});
+
+    function calculateTotal() {
+
+    let days = parseFloat(document.querySelector("[name='days']").value) || 0;
+    let rate = parseFloat(document.querySelector("[name='rate']").value) || 0;
+    let amount = days * rate;
+    document.querySelector("[name='amount']").value = amount;
+
+    let rate1 = parseFloat(document.querySelector("[name='rate1']").value) || 0;
+    let amount1 = rate1;
+    document.querySelector("[name='amount1']").value = amount1;
+
+    let days2 = parseFloat(document.querySelector("[name='days2']").value) || 0;
+    let rate2 = parseFloat(document.querySelector("[name='rate2']").value) || 0;
+    let amount2 = days2 * rate2;
+    document.querySelector("[name='amount2']").value = amount2;
+
+    let extraDays = parseFloat(document.querySelector("[name='extra_days']").value) || 0;
+    let extraRate = parseFloat(document.querySelector("[name='extra_rate']").value) || 0;
+    let extraAmount = extraDays * extraRate;
+    document.querySelector("[name='extra_amount']").value = extraAmount;
+
+    let tollDays = parseFloat(document.querySelector("[name='toll_days']").value) || 0;
+    let tollRate = parseFloat(document.querySelector("[name='toll_rate']").value) || 0;
+    let tollAmount = tollDays * tollRate;
+    document.querySelector("[name='toll_amount']").value = tollAmount;
+
+    const total = amount + amount2 + extraAmount + tollAmount;
+
+    document.querySelector("[name='total']").value = total;
+}
+</script>
+</body>
+</html>
