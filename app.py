@@ -183,7 +183,7 @@ def generate():
     data["total"] = round(total, 2)
 
     # 2️⃣ Render HTML (your existing HTML template)
-    html_out = render_template("your_invoice.html", **data)
+    html_out = render_template("invoice.html", **data)
 
     # 3️⃣ Generate PDF in memory with WeasyPrint
     pdf_file = io.BytesIO()
